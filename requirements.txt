@@ -1,0 +1,1 @@
+oslo.concurrency>=3.27.0
