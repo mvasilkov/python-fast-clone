@@ -16,7 +16,8 @@ CACHE = Path.home() / '.cache' / 'python-fast-clone'
 
 CACHE_EXPIRE = timedelta(days=1)
 
-CLEAN = 'nothing to commit, working tree clean'
+CLEAN = 'nothing to commit, working tree clean'  # 2.14.1
+CLEAN2 = 'nothing to commit, working directory clean'  # 2.7.4
 
 LOCK_PATH = str(CACHE)
 
@@ -97,7 +98,7 @@ def _clone(repo: str):
 
 def _check_clean():
     p = _run(['git', '-C', 'FOO', 'status'])
-    if CLEAN not in p.stdout:
+    if CLEAN not in p.stdout and CLEAN2 not in p.stdout:
         raise RuntimeError('fastclone: Working tree not clean')
 
 
