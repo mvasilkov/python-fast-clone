@@ -4,7 +4,7 @@ if __name__ == '__main__':
     setup(
         name='fastclone',
 
-        version='0.0.3',
+        version='0.0.4',
 
         description='',
         long_description='',
