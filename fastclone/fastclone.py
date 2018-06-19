@@ -12,6 +12,9 @@ from oslo_concurrency import lockutils
 
 __all__ = ['fastclone']
 
+ASSUME_REMOTE = 'origin'
+ASSUME_BRANCH = 'master'
+
 CACHE = Path.home() / '.cache' / 'python-fast-clone'
 
 CACHE_EXPIRE = timedelta(days=1)
@@ -104,10 +107,10 @@ def _check_clean():
 
 def _pull(path: str, branch: str = None):
     if branch is None:
-        _run(['git', '-C', path, 'pull', '-q'])
-    else:
-        _run(['git', '-C', path, 'fetch', '-q'])
-        _run(['git', '-C', path, 'checkout', '-q', branch])
+        branch = ASSUME_BRANCH
+    _run(['git', '-C', path, 'fetch', '-q', ASSUME_REMOTE])
+    _run(['git', '-C', path, 'reset', '-q', '--hard', f'{ASSUME_REMOTE}/{branch}'])
+    _run(['git', '-C', path, 'checkout', '-q', branch])
 
 
 def _relpath(a):
@@ -115,17 +118,18 @@ def _relpath(a):
 
 
 def _tar_c(tarball: Path):
-    if MSDOS:
+    if MSDOS:  # tar cannot into paths starting with C:
         tarball = _relpath(tarball)
     _run(['tar', 'cf', tarball, 'FOO'])
 
 
 def _tar_x(tarball: Path, path: str):
-    if MSDOS:
+    if MSDOS:  # tar cannot into paths starting with C:
         tarball = _relpath(tarball)
         path = _relpath(path)
     _run(['tar', 'xf', tarball, '-C', path, '--strip-components', 1])
 
 
 def _unset_readonly():
+    assert MSDOS
     _run(['attrib', '-R', 'FOO/*', '/S'])
